@@ -1,0 +1,105 @@
+create database win_fun
+use win_fun
+
+create table  ineu_students(
+students_id int ,
+students_batch varchar(30),
+students_name varchar(30),
+students_stream varchar(30),
+students_marks int,
+students_mail_id varchar(40))
+
+INSERT INTO ineu_students 
+VALUES
+(120, 'FSDA', 'Rocky', 'CS', 92, 'rot@gmail.com'),
+(101, 'FSDA', 'Rohit', 'CS', 80, 'rohit@gmail.com'),
+(102, 'FSDA', 'Rohan', 'CS', 70, 'Rohan@gmail.com'),
+(103, 'FSDA', 'Ankit', 'CS', 66, 'Ankit@gmail.com'),
+(104, 'FSDA', 'Aman', 'ME', 70, 'Aman@gmail.com'),
+(105, 'DA', 'Arjun', 'ME', 72, 'Arjun@gmail.com'),
+(106, 'DA', 'Sanchit', 'ME', 40, 'Sanchit@gmail.com'),
+(107, 'DA', 'Manisha', 'EE', 91, 'Manisha@gmail.com'),
+(108, 'SD', 'Ishita', 'EE', 63, 'Ishita@gmail.com'),
+(109, 'SD', 'Ashiya', 'IT', 74, 'Ashiya@gmail.com'),
+(110, 'SD', 'Arjun', 'AE', 81, 'Arjun@gmail.com'),
+(111, 'SD', 'Prateek', 'AE', 78, 'Prateek@gmail.com'),
+(112, 'FSJB', 'Ankit', 'BE', 85, 'ankit22@gmail.com'),
+(113, 'FSRG', 'Sneha', 'CE', 92, 'sneha_kumar@gmail.com'),
+(114, 'FSMK', 'Rahul', 'EE', 76, 'rahul_verma@mail.com'),
+(115, 'SDE', 'Nisha', 'ME', 88, 'nisha.mehta@gmail.com'),
+(116, 'VR', 'Amit', 'CS', 81, 'amit123@gmail.com'),
+(117, 'NP', 'Divya', 'IT', 79, 'divya.it@gmail.com'),
+(118, 'KL', 'Rajat', 'ME', 84, 'rohit_kumar@mail.com'),
+(119, 'PP', 'Anjali', 'EE', 90, 'anjali.ee@gmail.com');
+
+DELETE from ineu_students 
+WHERE students_id = 101;
+select * from ineu_students 
+
+select students_batch, max(students_marks) AS MARKS from ineu_students group by students_batch
+select students_batch , count(students_batch) from ineu_students group by students_batch;
+select students_batch, count(*) from ineu_students group by students_batch;
+
+SELECT * FROM ineu_students
+WHERE students_batch = 'FSDA'
+AND students_marks = (
+    SELECT MAX(students_marks)
+    FROM ineu_students
+    WHERE students_batch = 'FSDA'
+);
+
+SELECT max(students_marks) from ineu_students WHERE students_batch = 'FSDA'
+SELECT students_name, max(students_marks) from ineu_students where students_batch = 'FSDA' 
+
+SELECT * from ineu_students where students_marks in
+(select max(students_marks) from ineu_students where students_batch='FSDA')
+
+select * from ineu_students where students_batch = 'FSDA' order by students_marks desc LIMIT 3,1
+
+SELECT 
+    students_id, 
+    students_name, 
+    students_stream, 
+    students_marks, 
+    ROW_NUMBER() OVER (ORDER BY students_marks) AS 'NEW_RO_NUMBER'
+FROM 
+    ineu_students;
+    
+SELECT students_id,  students_name, students_stream, students_marks, 
+row_number() over(partition by students_batch order by students_marks) as 'row_number'
+from ineu_students;
+
+
+Select * from (SELECT students_id,  students_name, students_stream, students_marks, 
+row_number() over(partition by students_batch order by students_marks) as 'row_num'
+from ineu_students)AS TEST where row_num = 1
+
+SELECT  students_id, students_name, students_stream, students_marks, 
+    ROW_NUMBER() OVER (ORDER BY students_marks DESC) AS RO_NUMBER,
+    RANK() OVER (ORDER BY students_marks DESC) AS ROW_RANK
+FROM ineu_students;
+
+SELECT  students_id, students_name, students_stream, students_marks, 
+    ROW_NUMBER() OVER (partition by students_batch ORDER BY students_marks DESC) AS RO_NUMBER,
+    RANK() OVER (partition by students_batch ORDER BY students_marks DESC) AS ROW_RANK
+FROM ineu_students;
+
+SELECT *FROM (SELECT students_id, students_name, students_stream, students_marks, 
+        ROW_NUMBER() OVER (PARTITION BY students_batch ORDER BY students_marks DESC) AS RO_NUMBER,
+        RANK() OVER (PARTITION BY students_batch ORDER BY students_marks DESC) AS ROW_RANK
+    FROM ineu_students
+) AS TEST WHERE ROW_RANK = 1;
+
+
+SELECT  students_id, students_name, students_stream, students_marks, 
+    ROW_NUMBER() OVER (ORDER BY students_marks DESC) AS RO_NUMBER,
+    RANK() OVER (ORDER BY students_marks DESC) AS ROW_RANK,
+    DENSE_RANK() OVER( ORDER BY students_marks DESC) AS REAL_RANK
+FROM ineu_students;
+
+SELECT *FROM (SELECT students_id, students_name, students_stream, students_marks, 
+        ROW_NUMBER() OVER (PARTITION BY students_batch ORDER BY students_marks DESC) AS RO_NUMBER,
+        RANK() OVER (PARTITION BY students_batch ORDER BY students_marks DESC) AS ROW_RANK,
+        DENSE_RANK() OVER (PARTITION BY students_batch ORDER BY students_marks DESC) AS REAL_RANK
+    FROM ineu_students
+) AS TEST WHERE REAL_RANK = 2;
